@@ -5,6 +5,7 @@ from multiprocessing import Queue as pQueue
 from threading import Thread
 
 import cv2
+from cv2 import divide
 import numpy as np
 import torch
 import torch.multiprocessing as mp
@@ -21,6 +22,7 @@ from pPose_nms import pose_nms
 from yolo.darknet import Darknet
 from yolo.preprocess import prep_image, prep_frame
 from yolo.util import dynamic_write_results
+from alfred.dl.torch.common import device
 
 # import the Queue class from Python 3
 if sys.version_info >= (3, 0):
@@ -277,7 +279,7 @@ class DetectionLoader:
         self.det_inp_dim = int(self.det_model.net_info['height'])
         assert self.det_inp_dim % 32 == 0
         assert self.det_inp_dim > 32
-        self.det_model.cuda()
+        self.det_model.to(device)
         self.det_model.eval()
 
         self.stopped = False
@@ -318,8 +320,8 @@ class DetectionLoader:
 
             with torch.no_grad():
                 # Human Detection
-                img = img.cuda()
-                prediction = self.det_model(img, CUDA=True)
+                img = img.to(device)
+                prediction = self.det_model(img, CUDA=torch.cuda.is_available())
                 # NMS process
                 dets = dynamic_write_results(prediction, opt.confidence,
                                              opt.num_classes, nms=True, nms_conf=opt.nms_thesh)

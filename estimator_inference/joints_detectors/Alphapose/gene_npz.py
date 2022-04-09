@@ -104,7 +104,7 @@ def handle_video(video_file):
     if os.path.exists(args.outputpath):
         shutil.rmtree(f'{args.outputpath}/vis', ignore_errors=True)
     else:
-        os.mkdir(args.outputpath)
+        os.makedirs(args.outputpath, exist_ok=True)
     videofile = args.video
     mode = args.mode
     if not len(videofile):
@@ -127,7 +127,7 @@ def handle_video(video_file):
         pose_model = InferenNet_fast(4 * 1 + 1, pose_dataset)
     else:
         pose_model = InferenNet(4 * 1 + 1, pose_dataset)
-    pose_model.cuda()
+    pose_model.to(device)
     pose_model.eval()
     runtime_profile = {
         'dt': [],
@@ -164,7 +164,7 @@ def handle_video(video_file):
             num_batches = datalen // batchSize + leftover
             hm = []
             for j in range(num_batches):
-                inps_j = inps[j * batchSize:min((j + 1) * batchSize, datalen)].cuda()
+                inps_j = inps[j * batchSize:min((j + 1) * batchSize, datalen)]
                 hm_j = pose_model(inps_j)
                 hm.append(hm_j)
             hm = torch.cat(hm)

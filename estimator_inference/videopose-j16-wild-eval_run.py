@@ -7,6 +7,7 @@ from common.utils import evaluate, add_path
 from tool.utils import *
 import scipy.signal
 import glob
+from alfred.dl.torch.common import device
 
 add_path()
 
@@ -147,7 +148,7 @@ class Visualization(object):
         filter_widths = [int(x) for x in architecture.split(',')]
         model_pos = TemporalModel(16, 2, 16, filter_widths=filter_widths, causal=args.causal, dropout=args.dropout,
                                   channels=args.channels,
-                                  dense=args.dense).cuda()
+                                  dense=args.dense).to(device)
         # load trained model
         print('Loading checkpoint', ckpt_path)
         checkpoint = torch.load(ckpt_path, map_location=lambda storage, loc: storage)
@@ -160,7 +161,7 @@ class Visualization(object):
         filter_widths = [int(x) for x in architecture.split(',')]
         model_traj = TemporalModel(16, 2, 1, filter_widths=filter_widths, causal=args.causal, dropout=args.dropout,
                                   channels=args.channels,
-                                  dense=args.dense).cuda()
+                                  dense=args.dense).to(device)
 
         # load trained model
         print('Loading checkpoint', ckpt_path)
