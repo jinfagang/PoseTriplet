@@ -1,4 +1,5 @@
 from video2bvh.bvh_skeleton import h36m_skeleton, cmu_skeleton
+from video2bvh.bvh_skeleton import humanoid_1205_skeleton
 from video2bvh.utils import vis
 import os
 import pickle
@@ -27,7 +28,9 @@ gif_file = os.path.join(output_dir, '3d_pose_300.gif')
 # ani.to_html5_video()
 
 bvh_file = os.path.join(output_dir, 'a.bvh')
-# cmu_skel = cmu_skeleton.CMUSkeleton()
-# channels, header = cmu_skel.poses2bvh(pose3d_world, output_file=bvh_file)
-h36m_skel = h36m_skeleton.H36mSkeleton()
-_ = h36m_skel.poses2bvh(pose3d_world, output_file=bvh_file)
+
+Converter = humanoid_1205_skeleton.SkeletonConverter()
+prediction3dpoint = Converter.convert_to_21joint(pose3d_world)
+
+human36m_skeleton = humanoid_1205_skeleton.H36mSkeleton()
+_ = h36m_skel.poses2bvh(prediction3dpoint, output_file=bvh_file)
