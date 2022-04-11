@@ -164,7 +164,7 @@ def handle_video(video_file):
             num_batches = datalen // batchSize + leftover
             hm = []
             for j in range(num_batches):
-                inps_j = inps[j * batchSize:min((j + 1) * batchSize, datalen)]
+                inps_j = inps[j * batchSize:min((j + 1) * batchSize, datalen)].to(device)
                 hm_j = pose_model(inps_j)
                 hm.append(hm_j)
             hm = torch.cat(hm)
