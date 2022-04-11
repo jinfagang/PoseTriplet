@@ -5,6 +5,7 @@
 """
 
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 
 def normalize(x):
@@ -139,7 +140,65 @@ def quat2euler(q, order='zxy', eps=1e-8):
         y = np.arctan2(2 * (q0 * q2 - q1 * q3), 1 - 2 * (q1 * q1 + q2 * q2))
         z = np.arctan2(2 * (q0 * q3 - q1 * q2), 1 - 2 * (q1 * q1 + q3 * q3))
         euler = np.stack([z, x, y], axis=1)
+    elif order == 'xyz':
+        # x = np.arcsin(np.clip(2 * (q0 * q1 + q2 * q3), -1 + eps, 1 - eps))
+        # y = np.arctan2(2 * (q0 * q2 - q1 * q3), 1 - 2 * (q1 * q1 + q2 * q2))
+        # z = np.arctan2(2 * (q0 * q3 - q1 * q2), 1 - 2 * (q1 * q1 + q3 * q3))
+        # euler = np.stack([z, x, y], axis=1)
+        # euler = np.stack([x, y, z], axis=1)
+
+        # for debug - zxy, xyz
+        # rot = Rotation.from_quat(q)
+        newq = np.stack([q1, q2, q3, q0], axis=1)
+        rot = Rotation.from_quat(newq)
+        # rot = Rotation.from_euler('ZXY', euler) #, degrees=True)
+        # euler = rot.as_euler('xyz') #, degrees=True)
+        euler = rot.as_euler('XYZ') #, degrees=True)
+        # euler3 = rot.as_euler('zxy') #, degrees=True)
+        # euler4 = rot.as_euler('ZXY') #, degrees=True)
+        # debug = euler4 - euler
+        # euler4 = rot.as_euler('ZXY') #, degrees=True)
     else:
         raise ValueError('Not implemented')
 
     return np.reshape(euler, original_shape)
+
+
+
+############################ add 0915
+def anglefrom3points(a, b, c):
+    # a = np.array([1, 0, 0])
+    # b = np.array([0, 0, 0])
+    # c = np.array([-1, 0, 0])
+    f = b - a
+    e = b - c
+    abVec = np.linalg.norm(f)
+    bcVec = np.linalg.norm(e)
+    abNorm = f / abVec
+    bcNorm = e / bcVec
+    res = abNorm[0] * bcNorm[0] + abNorm[1] * bcNorm[1] + abNorm[2] * bcNorm[2]
+    if np.abs(res) > 1:
+        if np.abs(res) < 1 + 1e-5:
+            res = np.clip(res, -1, 1)
+        else:
+            print(a, b, c, res)
+            assert False, 'invalid value appear'
+    angle = np.arccos(res) * 180.0 / np.pi
+    return angle
+
+
+def euler2quat(euler):
+    rot = Rotation.from_euler('XYZ', euler)
+    q = rot.as_quat()  # The returned value is in scalar-last (x, y, z, w) format.
+    q = np.reshape(q, [-1, 4])
+    q0 = q[:, 0]
+    q1 = q[:, 1]
+    q2 = q[:, 2]
+    q3 = q[:, 3]
+    newq = np.stack([q3, q0, q1, q2], axis=1)
+
+    if q3 > 0:
+        newq = newq * 1
+    else:
+        newq = newq * -1
+    return np.squeeze(newq)  # The returned value is in scalar-last (w, x, y, z) format.

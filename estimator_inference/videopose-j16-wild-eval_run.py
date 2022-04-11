@@ -278,9 +278,9 @@ if __name__ == '__main__':
     for args.architecture in ['3,3,3']:
         # for args.pose2dscale in [0.5, 0.7, 0.85, 1]:
         for args.pose2dscale in [1]:
-
             args.eval_data = 'bilibili-clip'
             eval_video_list = glob.glob('./wild_eval/source_video/{}/*.mp4'.format(args.eval_data))
+            print(eval_video_list)
             for path_name in eval_video_list[:1]:
                 args.viz_video_path = path_name
                 args.frame_rate = 30
