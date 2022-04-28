@@ -17,19 +17,32 @@ _CONTROL_TIMESTEP = 0.04
 SUITE = containers.TaggedTasks()
 THIS_DIR = os.path.dirname(__file__)
 # MODEL_XML_PATH = '/home/jintian/mujoco/model/humanoid/humanoid.xml'
-# MODEL_XML_PATH = os.path.join(THIS_DIR, './models/humanoid_h36m/humanoid_h36m_v5.xml') 
-MODEL_XML_PATH = 'models/mug/mug.xml'
+MODEL_XML_PATH = os.path.join(THIS_DIR, "./models/humanoid_h36m/humanoid_h36m_v5.xml")
+# MODEL_XML_PATH = "models/mug/mug.xml"
+
 
 def get_model_and_assets():
-    """Returns a tuple containing the model XML string and a dict of assets."""
+    _FILENAMES = [
+        "./common/materials.xml",
+        "./common/skybox.xml",
+        "./common/visual.xml",
+        "./common/sky1.png",
+        "./common/grass.png",
+    ]
+    ASSETS = {
+        filename: resources.GetResource(
+            os.path.join(os.path.dirname(MODEL_XML_PATH), filename)
+        )
+        for filename in _FILENAMES
+    }
+    print(ASSETS.keys())
     # return common.read_model(MODEL_XML_PATH), common.ASSETS
     # return resources.GetResource(MODEL_XML_PATH), common.ASSETS
-    return resources.GetResource(MODEL_XML_PATH), {}
+    return resources.GetResource(MODEL_XML_PATH), ASSETS
 
 
 @SUITE.add("playing")
 def my_env(time_limit=_DEFAULT_TIME_LIMIT, random=None, environment_kwargs=None):
-    """Returns the Test task."""
     physics = Physics.from_xml_string(*get_model_and_assets())
     task = Robot()
     environment_kwargs = environment_kwargs or {}
@@ -37,7 +50,7 @@ def my_env(time_limit=_DEFAULT_TIME_LIMIT, random=None, environment_kwargs=None)
         physics,
         task,
         time_limit=time_limit,
-        control_timestep=_CONTROL_TIMESTEP,
+        # control_timestep=_CONTROL_TIMESTEP,
         **environment_kwargs
     )
 
@@ -63,6 +76,10 @@ class Robot(base.Task):
     def get_reward(self, physics):
         """Returns a reward to the agent."""
         return 0
+    
+    def action_spec(self, physics):
+        """Returns a `BoundedArraySpec` matching the `physics` actuators."""
+        return mujoco.action_spec(physics)
 
 
 def simple_demo():
@@ -79,5 +96,5 @@ def simple_demo():
     viewer.launch(env, policy=random_policy)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     simple_demo()
