@@ -31,15 +31,10 @@ class Logger(object):
                 os.makedirs(os.path.join(log_dir, name))
             except:
                 pass
-            self.writer = tf.summary.FileWriter(os.path.join(log_dir, name),
-                                                filename_suffix=name)
-        else:
-            self.writer = tf.summary.FileWriter(log_dir)
 
     def scalar_summary(self, tag, value, step):
         """Log a scalar variable."""
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
-        self.writer.add_summary(summary, step)
 
     def image_summary(self, tag, images, step):
         """Log a list of images."""
@@ -62,7 +57,6 @@ class Logger(object):
 
         # Create and write Summary
         summary = tf.Summary(value=img_summaries)
-        self.writer.add_summary(summary, step)
 
     def histo_summary(self, tag, values, step, bins=1000):
         """Log a histogram of the tensor of values."""
@@ -89,8 +83,6 @@ class Logger(object):
 
         # Create and write Summary
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
-        self.writer.add_summary(summary, step)
-        self.writer.flush()
 
     def to_np(self, x):
         return x.data.cpu().numpy()

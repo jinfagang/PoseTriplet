@@ -411,5 +411,6 @@ if __name__ == '__main__':
         result_all_dict[take] = get_random_qpos(plot=False, scale=scale, random_flip=True, curve_type=args.curve_type)
     traj_save_path = '{}/datasets/traj_dict/traj_dict.pkl'.format(args.mocap_folder)
     mkd(traj_save_path)
+    print(traj_save_path)
     with open(traj_save_path, 'wb') as f:
         pickle.dump(result_all_dict, f)

@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', default='subject_init')
 parser.add_argument('--render', action='store_true', default=False)
 parser.add_argument('--num-threads', type=int, default=1)
-parser.add_argument('--gpu-index', type=int, default=1)
+parser.add_argument('--gpu-index', type=int, default=0)
 parser.add_argument('--iter', type=int, default=0)  # for pretrain case
 parser.add_argument('--show-noise', action='store_true', default=False)
 parser.add_argument('--mocap-folder', type=str, default='checkpoint/exp_init/helix_0')

@@ -89,9 +89,12 @@ def simple_demo():
 
     def random_policy(time_step):
         del time_step
-        return np.random.uniform(
-            low=action_spec.minimum, high=action_spec.maximum, size=action_spec.shape
+        rdm_policy = np.random.uniform(
+            # low=action_spec.minimum, high=action_spec.maximum, size=action_spec.shape
+            low=0, high=1, size=action_spec.shape
         )
+        print(rdm_policy)
+        return rdm_policy
 
     viewer.launch(env, policy=random_policy)
 
